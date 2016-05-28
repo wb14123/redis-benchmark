@@ -26,3 +26,4 @@ mappings in Universal ++= {
 }
 
 scriptClasspath := Seq("../config/") ++ scriptClasspath.value
+javaOptions += "-Xmx8G"

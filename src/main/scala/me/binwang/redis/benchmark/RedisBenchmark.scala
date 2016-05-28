@@ -4,9 +4,6 @@ import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import redis.{RedisDispatcher, RedisServer, RedisClientPool}
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
-
 object RedisBenchmark {
 
   implicit val akkaSystem = ActorSystem("redis-benchmark")
@@ -17,19 +14,19 @@ object RedisBenchmark {
   val poolSize = config.getInt("redis.pool-size")
   val redisHost = config.getString("redis.host")
   val redisPort = config.getInt("redis.port")
+  val ops = config.getInt("ops")
 
   val redisClient = RedisClientPool(
     (0 to poolSize).map(n => RedisServer(redisHost,redisPort)))
 
-  def get(redisClient: RedisClientPool) = {
+  def get(): Unit = {
     val key = "some_key"
-    redisClient.get(key)
+    val result = redisClient.get(key)
+    result onSuccess { case _ => get() }
   }
 
-  def benchmark(ops: Int) = {
-    val seqResult = (0 to ops).map(_ => get(redisClient))
-    val result = Future.sequence(seqResult)
-    Await.result(result, Duration.Inf)
+  def benchmark() = {
+    (0 to ops) foreach { _ => get() }
     // (0 to ops).foreach(_ => get(redisClient))
     // Thread.sleep(ops / 1000)
   }
