@@ -6,7 +6,7 @@ scalaVersion := "2.11.6"
 
 libraryDependencies ++= {
   Seq(
-    "com.github.etaty" %% "rediscala" % "1.7.0-SNAPSHOT"
+    "com.github.etaty" %% "rediscala" % "1.7.0"
   )
 }
 
